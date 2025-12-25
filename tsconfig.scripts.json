@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+      "target": "es2019",
+      "module": "commonjs",
+      "moduleResolution": "node",
+      "esModuleInterop": true,
+      "allowSyntheticDefaultImports": true,
+      "resolveJsonModule": true,
+      "skipLibCheck": true,
+      "outDir": "dist-scripts",
+      "strict": true,
+      "typeRoots": ["./types", "./node_modules/@types"]
+    },
+    "include": ["scripts/**/*"]
+}  

@@ -1,7 +1,11 @@
-import { defineConfig } from '@prisma/config';
+import { defineConfig, env } from 'prisma/config'
+import 'dotenv/config'
+
+const databaseUrl = process.env.DATABASE_URL as string;
 
 export default defineConfig({
-  schema: './prisma/schema.prisma',
-  // Langsung definisikan url di root jika tipe datanya mengizinkan
-  url: process.env.DATABASE_URL, 
-} as any);
+  schema: 'prisma/schema.prisma',
+  datasource: {
+    url: databaseUrl,
+  },
+})

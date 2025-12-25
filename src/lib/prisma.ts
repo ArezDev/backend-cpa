@@ -1,12 +1,23 @@
-import { PrismaClient } from '../generated/prisma/client';
-import { PrismaMysql } from '@prisma/adapter-mysql';
-import mysql from 'mysql2/promise';
+import { PrismaMariaDb } from '@prisma/adapter-mariadb'
+import { PrismaClient } from '../generated/prisma/client'
 
-// Koneksi Pool MySQL menggunakan IP Tailscale
-const connectionString = process.env.DATABASE_URL;
-const pool = mysql.createPool(connectionString);
+const globalForPrisma = global as unknown as { prisma: PrismaClient | undefined }
 
-// Gunakan Adapter MySQL
-const adapter = new PrismaMysql(pool);
+const createPrismaClient = () => {
+  // Only use the adapter if you actually need the custom driver features
+  const adapter = new PrismaMariaDb({
+    host: process.env.DB_HOST,
+    port: Number(process.env.DB_PORT),
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    connectionLimit: 5,
+    allowPublicKeyRetrieval: true,
+  });
 
-export const prisma = new PrismaClient({ adapter });
+  return new PrismaClient({ adapter });
+}
+
+export const prisma = globalForPrisma.prisma ?? createPrismaClient()
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
