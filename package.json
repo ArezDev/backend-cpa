@@ -6,10 +6,7 @@
     "dev": "next dev",
     "build:geolite": "tsc -p tsconfig.scripts.json",
     "update:geolite": "node dist-scripts/update-geolite.js",
-    "worker": "npx tsx worker.ts",
-    "db:sync": "npx prisma db push && npx prisma generate",
-    "infra:up": "docker-compose up -d",
-    "infra:down": "docker-compose down"
+    "db:sync": "npx prisma db push && npx prisma generate"
   },
   "dependencies": {
     "@prisma/adapter-mariadb": "^7.2.0",

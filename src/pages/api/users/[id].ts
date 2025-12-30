@@ -2,6 +2,11 @@ import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { NextApiRequest, NextApiResponse } from 'next';
 
+interface UserUpdate {
+  username?: string;
+  password?: string;
+}
+
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse
@@ -17,9 +22,12 @@ export default async function handler(
             if (!id) {
                 return res.status(400).json({ error: 'Missing required fields' });
             }
-            let dataToUpdate: any = {};
+            const dataToUpdate: UserUpdate = {};
             if (username) dataToUpdate.username = username;
             if (password) dataToUpdate.password = hashedPassword;
+            if (Object.keys(dataToUpdate).length === 0) {
+                throw new Error("No fields provided for update");
+            }
             const user = await prisma.users.update({
                 where: { id: Number(id) },
                 data: dataToUpdate,

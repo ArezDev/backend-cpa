@@ -12,12 +12,12 @@ export default async function handler(
     //get waktu wib
     const { start, end, startISO, endISO } = saiki();
     console.log(`Saiki: ${start}\nSampek: ${end}\n ${startISO}\n ${endISO}`);
-    // const ip =
-    //     (req.headers["x-forwarded-for"] as string)?.split(",")[0] ||
-    //     req.socket.remoteAddress ||
-    //     "";
+    const ip =
+        (req.headers["x-forwarded-for"] as string)?.split(",")[0] ||
+        req.socket.remoteAddress ||
+        "";
     //const ip = "182.8.65.124";
-    const ip = "157.240.208.255";
+    //const ip = "157.240.208.255";
     const userAgent = req.headers["user-agent"] || "Unknown";
     const isMobile =
         /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
@@ -143,18 +143,8 @@ export default async function handler(
             end
         );
 
-        // Get redirect url
-        // const redirectUrl = await prisma.smartlink.findFirst({
-        //     where: { network },
-        //     select: { url: true }
-        // });
-
-        // if (!redirectUrl) {
-        //     return res.status(404).json({ error: 'Redirect URL not found' });
-        // }
-
         // 2. Cache the result (expire in 1 hour)
-        await redis.setex(cacheKey, 3600, clickId);
+        await redis.set(cacheKey, clickId, 'EX', 3600);
 
         // 3. Publish event to Kafka
         publishEvent('redirek-link', user, 'redirect', 'success').catch(console.error);
