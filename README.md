@@ -62,6 +62,15 @@ sudo nginx -t
 sudo systemctl restart nginx
 ```
 
+# UFW FIREWALL
+
+```bash
+# Blokir port 3000 dari akses luar (hanya biarkan Nginx internal yang akses)
+sudo ufw deny 3000/tcp
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+```
+
 # Deploy gaskennn
 
 ```bash
