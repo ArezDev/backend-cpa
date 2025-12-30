@@ -7,7 +7,7 @@ services:
     restart: always
     ports:
       - "3000:3000"
-    # Rangkaian perintah otomatis Anda
+    # Rangkaian perintah otomatis: Prisma -> TSC -> GeoLite -> Start
     command: >
       sh -c "npx prisma db push && 
              npx prisma generate && 
@@ -26,17 +26,22 @@ services:
         condition: service_healthy
       kafka:
         condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: 4G # Alokasi luas untuk proses Build & Runtime
     logging:
       driver: "json-file"
       options:
-        max-size: "10m"
+        max-size: "50m" # Log lebih besar karena RAM/Disk lega
         max-file: "3"
 
   redis:
     image: redis:7-alpine
     container_name: redis_prod
     restart: always
-    command: redis-server --save 60 1 --loglevel warning --maxmemory 256mb --maxmemory-policy allkeys-lru
+    # Menggunakan 2GB RAM untuk Cache (sangat cepat untuk session/data sementara)
+    command: redis-server --save 60 1 --loglevel warning --maxmemory 2gb --maxmemory-policy allkeys-lru
     volumes:
       - redis_data:/data
     healthcheck:
@@ -47,7 +52,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 2G
 
   kafka:
     image: apache/kafka:3.8.0
@@ -65,13 +70,14 @@ services:
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
       - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
       - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
-      - KAFKA_HEAP_OPTS=-Xms512M -Xmx512M
+      # Optimasi Heap RAM: 4GB Xmx sangat ideal untuk 16GB RAM total
+      - KAFKA_HEAP_OPTS=-Xms4G -Xmx4G
     volumes:
       - kafka_data:/var/lib/kafka/data
     deploy:
       resources:
         limits:
-          memory: 1G
+          memory: 6G # Memberi ruang ekstra untuk overhead Java
 
 volumes:
   redis_data:

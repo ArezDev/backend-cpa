@@ -16,6 +16,19 @@ sudo swapon /swapfile
 echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 ```
 
+## Swappines
+
+```bash
+# Cek nilai saat ini
+cat /proc/sys/vm/swappiness
+
+# Ubah ke 10
+sudo sysctl vm.swappiness=10
+
+# Buat permanen
+echo 'vm.swappiness=10' | sudo tee -a /etc/sysctl.conf
+```
+
 # Setting Nginx
 
 ```bash
