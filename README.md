@@ -43,27 +43,44 @@ sudo nano /etc/nginx/sites-available/app-nextjs
 ```
 ```bash
 server {
-    listen 80;
     server_name domainanda.com www.domainanda.com;
 
-    # Optimalisasi Ukuran Upload (Jika ada upload file)
     client_max_body_size 20M;
 
+    # Gzip Compression
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml;
+
     location / {
-        proxy_pass http://localhost:3000;
+        proxy_pass http://127.0.0.1:3000; 
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
         proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
 
-        # Timeout lebih lama karena ada proses Kafka/Prisma yang mungkin delay
-        proxy_read_timeout 60s;
-        proxy_connect_timeout 60s;
+        proxy_buffering on;
+        proxy_buffer_size 128k;
+        proxy_buffers 4 256k;
+        
+        proxy_read_timeout 90s;
     }
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/domainanda.com/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/domainanda.com/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+}
+
+server {
+    if ($host = www.domainanda.com) { return 301 https://$host$request_uri; }
+    if ($host = domainanda.com) { return 301 https://$host$request_uri; }
+    listen 80;
+    server_name domainanda.com www.domainanda.com;
+    return 404; 
 }
 ```
 
