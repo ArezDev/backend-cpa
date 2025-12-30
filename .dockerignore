@@ -1,36 +1,8 @@
-# Dependencies
 node_modules
-npm-debug.log
-yarn-error.log
-.pnpm-debug.log*
-
-# Next.js build output
-.next/
-out/
-build/
-
-# Prisma
-# Jangan ignore prisma/schema.prisma karena dibutuhkan saat build
-prisma/migrations/
-
-# Environment variables
-# Jika variabel ENV hanya dibutuhkan saat RUNTIME (lewat docker-compose), biarkan di-ignore.
-# Jika dibutuhkan saat BUILD (NEXT_PUBLIC_...), hapus .env dari sini.
-.env.example
-.env.local
-.env.development.local
-.env.test.local
-
-# Git
+.next
 .git
-.gitignore
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Docker & CI/CD
+.env*.local
+dist-scripts
+*.db
 Dockerfile
 docker-compose.yml
-.github
-.vscode
