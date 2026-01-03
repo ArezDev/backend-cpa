@@ -11,9 +11,10 @@ export default async function handler(
     if (req.method === 'GET') {
         try {
             const smartlink = 
-            await prisma.smartlink.findMany({
+            await prisma.smartlinks.findMany({
                 where: { network: String(cpa) },
                 select: { 
+                    network: true,
                     url: true,
                     allowed: true
                 },
@@ -28,13 +29,15 @@ export default async function handler(
         }
     } else if (req.method === 'PUT') {
         try {
-            const modifiedUrl = req.body;
-            const editNetwork = await prisma.smartlink.update({
+            const { network, url, allowed } = req.body;
+            const editNetwork = await prisma.smartlinks.update({
                 where: {
                     id: Number(cpa)
                 },
                 data: {
-                    url: modifiedUrl
+                    network,
+                    url,
+                    allowed
                 }
             });
             return res.status(201).json({

@@ -1,10 +1,12 @@
-import { PrismaMariaDb } from '@prisma/adapter-mariadb'
-import { PrismaClient } from '../generated/prisma/client'
+import { PrismaMariaDb } from '@prisma/adapter-mariadb';
+import { PrismaClient } from '../generated/prisma/client';
 
-const globalForPrisma = global as unknown as { prisma: PrismaClient | undefined }
+// Gunakan globalThis agar lebih aman di berbagai environment
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined;
+};
 
 const createPrismaClient = () => {
-  // Only use the adapter if you actually need the custom driver features
   const adapter = new PrismaMariaDb({
     host: process.env.DB_HOST,
     port: Number(process.env.DB_PORT),
@@ -15,9 +17,14 @@ const createPrismaClient = () => {
     allowPublicKeyRetrieval: true,
   });
 
-  return new PrismaClient({ adapter });
-}
+  return new PrismaClient({ 
+    adapter,
+    // Tambahkan log ini saat development agar kamu bisa 
+    // memantau query yang berjalan di terminal
+    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+  });
+};
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient()
+export const prisma = globalForPrisma.prisma ?? createPrismaClient();
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;

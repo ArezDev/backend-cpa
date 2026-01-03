@@ -1,17 +1,17 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { prisma } from '@/lib/prisma';
 
-// type Lead = {
-//     userId?: string,
-//     country?: string,
-//     ip?: string,
-//     useragent?: string,
-//     network?: string
-// };
+type Lead = {
+    userId?: string,
+    country?: string,
+    ip?: string,
+    useragent?: string,
+    network?: string
+};
 
 type ResponseData = {
     success: boolean;
-    //data?: Lead;
+    data?: Lead;
     error?: string;
     message?: string;
 };
@@ -23,15 +23,13 @@ export default async function handler(
     if (req.method !== 'GET') {
         return res.status(405).json({ success: false, error: 'Method not allowed' });
     }
-
     try {
-        
+        // jupok payload
         const { leads, earn } = req.query;
-
+        // cek query
         if (!leads || !earn) {
             return res.status(400).json({ success: false, message: "Missing parameter!" });
         }
-
         // Decode base64
         const decodedString = Buffer.from(leads as string, 'base64').toString('utf-8');
         const parts = decodedString.split(",");
@@ -43,7 +41,7 @@ export default async function handler(
         // Create lead in database
         const [userId, country, ip, useragent, network] = parts;
         const earning = Number(earn);
-        await prisma.leads.create({
+        const sendLead = await prisma.leads.create({
             data: {
                 userId,
                 country,
@@ -51,10 +49,11 @@ export default async function handler(
                 useragent,
                 network,
                 earning
-                // Add other fields as needed
-            },
+            }
         });
-
+        // cek db query?
+        if (!sendLead) return res.status(500).json({ success: false, error: 'Error send Leads' });
+        // OK
         return res.status(201).json({success: true, message: 'Lead successfully saved!'});
     } catch (error: unknown) {
         console.error('Error creating lead:', error);

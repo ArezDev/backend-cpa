@@ -1,23 +1,12 @@
 -- CreateTable
 CREATE TABLE `users` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `username` VARCHAR(50) NOT NULL,
+    `username` VARCHAR(100) NOT NULL,
     `password` VARCHAR(255) NOT NULL,
-    `role` VARCHAR(20) NULL DEFAULT 'member',
-    `created_at` TIMESTAMP(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `role` ENUM('ketua', 'member') NOT NULL DEFAULT 'member',
+    `createdAt` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
 
     UNIQUE INDEX `username`(`username`),
-    PRIMARY KEY (`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `smartlink` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `network` VARCHAR(50) NOT NULL,
-    `url` VARCHAR(255) NOT NULL,
-    `allowed` VARCHAR(255) NULL,
-
-    UNIQUE INDEX `network`(`network`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -28,11 +17,11 @@ CREATE TABLE `user_summary` (
     `total_click` INTEGER NOT NULL DEFAULT 0,
     `total_lead` INTEGER NOT NULL DEFAULT 0,
     `total_earning` DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
-    `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `created_at` DATETIME(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
     `created_date` DATE NULL,
     `created_hour` VARCHAR(11) NULL,
     `created_week` VARCHAR(11) NULL,
-    `updated_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -46,7 +35,7 @@ CREATE TABLE `clicks` (
     `source` TEXT NULL,
     `gadget` VARCHAR(100) NULL,
     `ip` VARCHAR(45) NULL,
-    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `created_at` DATETIME(0) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -60,7 +49,7 @@ CREATE TABLE `live_clicks` (
     `source` TEXT NULL,
     `gadget` VARCHAR(100) NULL,
     `ip` VARCHAR(45) NULL,
-    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `created_at` DATETIME(0) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -74,16 +63,44 @@ CREATE TABLE `leads` (
     `country` VARCHAR(10) NULL,
     `useragent` TEXT NULL,
     `ip` VARCHAR(45) NULL,
-    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `created_at` DATETIME(0) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `realtime_access` (
-    `id` INTEGER NOT NULL DEFAULT 0,
     `password` VARCHAR(255) NOT NULL,
-    `role` VARCHAR(191) NOT NULL DEFAULT 'uwong',
+    `role` ENUM('uwong') NOT NULL,
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `postplay_redirect` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `url` TEXT NULL,
+    `title` VARCHAR(255) NULL,
+    `img` MEDIUMTEXT NULL,
+    `descr` VARCHAR(255) NULL,
+    `shortcode` VARCHAR(45) NULL,
+    `user_id` VARCHAR(100) NULL,
+    `hits` INTEGER NULL DEFAULT 0,
+    `useragent` TEXT NULL,
+    `last_accesed` TIMESTAMP(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `created_at` DATETIME(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
+
+    UNIQUE INDEX `uniq_shortcode`(`shortcode`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `smartlinks` (
+    `network` TEXT NOT NULL,
+    `url` TEXT NOT NULL,
+    `allowed` TEXT NOT NULL,
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

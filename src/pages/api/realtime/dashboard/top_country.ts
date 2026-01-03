@@ -3,12 +3,12 @@ import { prisma } from '@/lib/prisma';
 import { getCurrentWibWindowForDB } from '@/lib/time';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { startStr, endStr } = getCurrentWibWindowForDB();
+  const { start, end } = getCurrentWibWindowForDB();
   
   // Konversi string ke Date Object untuk Prisma
   const dateFilter = {
-    gte: new Date(startStr),
-    lt: new Date(endStr),
+    gte: new Date(start),
+    lt: new Date(end),
   };
 
   try {

@@ -12,7 +12,7 @@ services:
       - REDIS_URL=${REDIS_URL}
       - KAFKA_BROKER=${KAFKA_BROKER}
     extra_hosts:
-      - "dbserver:72.61.208.177"
+      - "dbserver:45.76.179.233"
     depends_on:
       - redis
       - kafka

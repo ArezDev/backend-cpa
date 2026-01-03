@@ -37,23 +37,27 @@ export function getSummaryWIB(saiki?: number | string | Date, sampek?: number | 
 export function getCurrentWibWindowForDB(nowInput?: number | Date) {
   const nowWIB = dayjs(nowInput ?? Date.now()).tz(WIB_TZ);
 
-  // start = 05:00 WIB untuk hari ini jika >=05:00; kalau belum, pakai 05:00 WIB kemarin
+  // Logika jam 7 pagi Anda
   const startWIB = (nowWIB.hour() < 7
     ? nowWIB.subtract(1, "day")
     : nowWIB
   ).hour(7).minute(0).second(0).millisecond(0);
 
-  const endWIB = startWIB.add(1, "day"); // half-open [start, end)
+  const endWIB = startWIB.add(1, "day");
 
-  const toDB = (d: dayjs.Dayjs) => d.add(DB_SHIFT_HOURS, "hour"); // -7h jika DB UTC-DATETIME
+  // Fungsi konversi ke Date objek (Prisma paling suka ini)
+  // DB_SHIFT_HOURS biasanya tidak diperlukan jika Prisma & DB sudah sinkron UTC
+  // Tapi jika Anda tetap ingin manual shift:
+  const toDBDate = (d: dayjs.Dayjs) => d.add(DB_SHIFT_HOURS, "hour").toDate();
+
   return {
-    startStr: toDB(startWIB).format("YYYY-MM-DD HH:mm:ss"),
-    endStr:   toDB(endWIB).format("YYYY-MM-DD HH:mm:ss"),
+    start: toDBDate(startWIB), // Menghasilkan Objek Date
+    end:   toDBDate(endWIB),   // Menghasilkan Objek Date
     debug: {
       startWIB: startWIB.format("YYYY-MM-DD HH:mm:ss"),
       endWIB:   endWIB.format("YYYY-MM-DD HH:mm:ss"),
-      startDB:  toDB(startWIB).format("YYYY-MM-DD HH:mm:ss"),
-      endDB:    toDB(endWIB).format("YYYY-MM-DD HH:mm:ss"),
+      startDB:  toDBDate(startWIB).toISOString(),
+      endDB:    toDBDate(endWIB).toISOString(),
     }
   };
 }

@@ -11,10 +11,23 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse
 ) {
-
     try {
-        
-        if(req.method === 'PUT') {
+        if(req.method === 'POST') {
+            const { username, password } = req.body;
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
+            if (!username || !password) {
+                return res.status(400).json({ error: 'Missing required fields' });
+            }
+            const user = await prisma.users.create({
+                data: {
+                    username,
+                    password: hashedPassword
+                },
+            });
+
+            res.status(200).json(user);
+        } else if(req.method === 'PUT') {
             const { id } = req.query;
             const { username, password } = req.body;
             const salt = await bcrypt.genSalt(10);
@@ -45,10 +58,9 @@ export default async function handler(
             });
             res.status(200).json(user);
         } else {
-            res.setHeader('Allow', ['GET', 'PUT', 'DELETE', 'POST']);
+            res.setHeader('Allow', ['PUT', 'DELETE', 'POST']);
             res.status(405).end(`Method ${req.method} Not Allowed`);
         }
-
     } catch (error : unknown) {
         res.status(500).json({ error: 'Error API', details: (error as Error).message });
     } finally {

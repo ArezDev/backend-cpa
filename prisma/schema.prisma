@@ -8,36 +8,36 @@ datasource db {
 }
 
 model users {
-  id         Int       @id @default(autoincrement())
-  username   String    @unique(map: "username") @db.VarChar(50)
-  password   String    @db.VarChar(255)
-  role       String?   @default("member") @db.VarChar(20)
-  created_at DateTime? @default(now()) @db.Timestamp(0)
-}
-
-model smartlink {
-  id      Int    @id @default(autoincrement())
-  network String @unique(map: "network") @db.VarChar(50)
-  url     String @db.VarChar(255)
-  allowed String? @db.VarChar(255)
+  id        Int        @id @default(autoincrement())
+  username  String     @unique(map: "username") @db.VarChar(100)
+  password  String     @db.VarChar(255)
+  role      users_role @default(member)
+  createdAt DateTime   @default(now()) @db.DateTime(0)
 }
 
 model user_summary {
-  id      Int    @id @default(autoincrement())
+  id            Int      @id @default(autoincrement())
   user          String   @db.VarChar(255)
   total_click   Int      @default(0)
   total_lead    Int      @default(0)
   total_earning Decimal  @default(0.00) @db.Decimal(10, 2)
   
-  created_at    DateTime? @default(now()) @db.DateTime
+  // Kolom Jangkar (Anchor)
+  created_at    DateTime
   
-  // Field opsional (YES pada kolom NULL di database)
+  // Kolom pembantu untuk laporan (opsional tapi bagus)
   created_date  DateTime? @db.Date
   created_hour  String?   @db.VarChar(11)
   created_week  String?   @db.VarChar(11)
+  updated_at    DateTime? @default(now()) @updatedAt @db.DateTime(0)
+
+  // 1. UBAH INDEX MENJADI UNIQUE
+  // Ini mencegah race condition: 2 klik masuk barengan tidak akan buat 2 baris
+  @@unique([user, created_at])
   
-  // Otomatis terupdate saat record berubah
-  updated_at    DateTime? @default(now()) @updatedAt @db.DateTime
+  // 2. TETAPKAN INDEX UNTUK QUERY LAPORAN
+  @@index([user])
+  @@index([created_at])
 }
 
 model clicks {
@@ -59,7 +59,7 @@ model live_clicks {
   source     String?  @db.Text
   gadget     String?  @db.VarChar(100)
   ip         String?  @db.VarChar(45)
-  created_at DateTime @default(now()) @db.DateTime
+  created_at DateTime @default(now())
 }
 
 model leads {
@@ -70,11 +70,41 @@ model leads {
   country    String?  @db.VarChar(10)
   useragent  String?  @db.Text
   ip         String?  @db.VarChar(45)
-  created_at DateTime @default(now()) @db.DateTime
+  created_at DateTime? @db.DateTime(0) @default(now())
 }
 
 model realtime_access {
-  id Int @id @default(0)
-  password String @db.VarChar(255)
-  role String @default("uwong")
+  password String               @db.VarChar(255)
+  role     realtime_access_role
+  id       Int                  @id @default(autoincrement())
+}
+
+model postplay_redirect {
+  id           Int       @id @default(autoincrement())
+  url          String?   @db.Text
+  title        String?   @db.VarChar(255)
+  img          String?   @db.MediumText
+  descr        String?   @db.VarChar(255)
+  shortcode    String?   @unique(map: "uniq_shortcode") @db.VarChar(45)
+  user_id      String?   @db.VarChar(100)
+  hits         Int?      @default(0)
+  useragent    String?   @db.Text
+  last_accesed DateTime? @default(now()) @updatedAt @db.Timestamp(0)
+  created_at   DateTime? @default(now()) @db.DateTime(0)
+}
+
+model smartlinks {
+  network String @db.Text
+  url     String @db.Text
+  allowed String @db.Text
+  id      Int    @id @default(autoincrement())
+}
+
+enum realtime_access_role {
+  uwong
+}
+
+enum users_role {
+  ketua
+  member
 }
