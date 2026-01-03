@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "build": "next build",
     "dev": "next dev",
     "build:geolite": "tsc -p tsconfig.scripts.json",
     "update:geolite": "node dist-scripts/update-geolite.js",
